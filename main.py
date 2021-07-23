@@ -2,7 +2,9 @@ import speech_recognition as sr                              # So voice can be r
 from gtts import gTTS                                        # So the program can ssave .mp3 files
 from playsound import playsound                              # So can run .mp3 files
 # from datetime import datetime                              # So can tell the date/time
-# import requests, json                                        # required for Weather API
+import requests, json                                        # required for Weather API
+from ipregistry import IpregistryClient                      # Get info from ip
+
 
 
 from capitals.capitals import getCapitalOrCountryName          # To find a capital/country given a capital/country
@@ -10,6 +12,7 @@ from dateAndTime.date import getDate                           # So can say the 
 from dateAndTime.time import getTime,getTimezoneOffsetAndName,getTimeWithZoneInfo  
                                                                # So can say the time and timezones
 from weather.weather import getWeather                         # So can tell the weather
+from funFacts.facts import getFact                             # So can say fun facts
 
 def take_command():
     recognizeSpeech = sr.Recognizer()
@@ -35,7 +38,7 @@ def take_command():
 def run_bot():
     command = take_command()
     print(command)
-    toSay = ""
+    toSay = "I'm so sorry! I couldn't understand you."
 
     if("repeat" in command):
         repeat()
@@ -50,9 +53,9 @@ def run_bot():
         toSay = getTimeWithZoneInfo(cityInfo,time)
     elif("date" in command or ("what" in command and "today" in command)):
         toSay = getDate()
-    else:
-        toSay = "I'm so sorry! I couldn't understand you."
-    
+    elif(("fun" in command and "fact" in command) or ("something" in command and "interesting" in command)):
+        toSay = getFact()
+
     talk(toSay)
 
 
