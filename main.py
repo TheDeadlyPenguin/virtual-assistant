@@ -4,12 +4,12 @@ from gtts import gTTS                                        # So the program ca
 from playsound import playsound                              # So can run .mp3 files
 # from datetime import datetime                              # So can tell the date/time
 import requests, json                                        # required for Weather API (general use)
-from ipregistry import IpregistryClient                      # Get info from ip
 # import pywhatkit                                           # Required for YT videos, general info and lookup
 
 import urllib.request                                        # Creating url's
 import urllib.parse                                          # Creating url's
 import re                                                    # Regex
+import os
 
 import webbrowser                                            # Required for YT videos
 
@@ -88,11 +88,17 @@ def run_bot():
 
 
 def talk(toSay):
+    try:
+        os.remove("reply.mp3")
+    except:
+        pass
+    # Free up audio resource
     toSpeak = gTTS(text=toSay, lang="en", slow=False)
     toSpeak.save("reply.mp3")
     
-    # Playing the converted file
+    # Playing the converted file and then 
     playsound('reply.mp3')
+    
 
 def repeat():
     repeatIntro = "The last thing I said was"
@@ -111,4 +117,4 @@ def playVideo(toBeSearched):
     webbrowser.open(videoURL, new=0, autoraise=True)
 
 
-run_bot()
+# run_bot()
