@@ -1,13 +1,19 @@
 import tkinter as tk
+from PIL import ImageTk, Image
 from win32api import GetSystemMetrics
 import main as bot
 
-def changeListeningLabel(updatedText):
-    print("yes i come")
-    listeningLabel.config(text = updatedText)
+
+def onEnter(event):
+    buttonToSpeak.config(image=buttonCircleHover)
+
+def onLeave(event):
+    buttonToSpeak.config(image=buttonCircleAwaiting)
 
 main = tk.Tk()
-main.title("Elena")
+main.title("")
+main.configure(bg='white')
+
 
 screen_width = GetSystemMetrics(0)
 screen_height =  GetSystemMetrics(1)
@@ -18,12 +24,26 @@ x = (screen_width/2) - (root_width/2)
 y = (screen_height/2) - (root_height/2)
 main.geometry('%dx%d+%d+%d' % (root_width, root_height, x, y))
 
-tk.Label(main, height = 8).grid(row = 0, column = 0)
-tk.Label(main, height = 7, width = 60, text = "LOGO", bg = "purple").grid(row = 1, column = 0)
-tk.Label(main, height = 3).grid(row = 2, column = 0)
-button = tk.Button(main, text ="Speak", command = bot.run_bot).grid(row = 3, column = 0)
-listeningLabel = tk.Label(main, height = 4, width = 60, text = "4")
-listeningLabel.grid(row = 2, column = 0)
+logo = ImageTk.PhotoImage(Image.open("../virtual-assistant/resources/elena.png"))
 
-main.iconbitmap("test.png")
+
+buttonCircleAwaiting = ImageTk.PhotoImage(Image.open("../virtual-assistant/resources/buttonWaiting.png"))
+buttonCircleHover = ImageTk.PhotoImage(Image.open("../virtual-assistant/resources/buttonHover.png"))
+
+tk.Label(main, height = 5,bg='white').grid(row = 0, column = 0)
+tk.Label(main, image = logo,bg='white').grid(row = 1, column = 0)
+tk.Label(main, height = 5,bg='white').grid(row = 2, column = 0)
+buttonToSpeak = tk.Button(main,image = buttonCircleAwaiting,bg='white', command = bot.run_bot,highlightthickness = 0, bd = 0)
+buttonToSpeak.grid(row = 3, column = 0)
+buttonToSpeak.focus()
+
+
+buttonToSpeak.bind('<Enter>',  onEnter)
+buttonToSpeak.bind('<Leave>',  onLeave)
+
+
+# file = r'icon.png'
+# img = Image.open(file)
+# img.save('icon.ico',format = 'ICO', sizes=[(32,32)])
+main.iconbitmap("../virtual-assistant/resources/icon.ico")
 main.mainloop()
