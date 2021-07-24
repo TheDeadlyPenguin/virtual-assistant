@@ -2,7 +2,7 @@ import requests, json
 
 def getTimeGivenZone(GMTOffset, currTime):
 
-    hour = int(currTime.split()[3]) - 3 #CUZ U IN BULGARIAAAAAA
+    hour = int(currTime.split()[3])
     mins = int(currTime.split()[6])
 
     hourOffset = 0
@@ -40,11 +40,15 @@ def getTimeGivenZone(GMTOffset, currTime):
 
     return updatedTime
 
-def getWeather(command, time):
+def getWeather(command, time, city):
 
     cityList = []
     timezoneNameList = []
-    timezoneGMTList = []     
+    timezoneGMTList = [] 
+
+    city_name = ""
+    zone_name = ""
+    zone_offset = ""    
 
     with open("../virtual-assistant/data/cities-and-full-timezones.txt") as file:
         for line in file:
@@ -65,9 +69,7 @@ def getWeather(command, time):
     api_key = "64e227e42c69d247408b968ccff4bdc5"
     base_url = "http://api.openweathermap.org/data/2.5/weather?"  
 
-    city_name = "Varna" #later should get current city
-    zone_name = ""
-    zone_offset = ""
+
 
     command = command.split()
     for i in range (len(cityList)):
@@ -75,6 +77,9 @@ def getWeather(command, time):
             city_name = cityList[i]
             zone_name = timezoneNameList[i]
             zone_offset = timezoneGMTList[i][3:]
+    
+    if(city_name == ""):
+        city_name = city
 
 
     complete_url = base_url + "appid=" + api_key + "&q=" + city_name
@@ -135,9 +140,13 @@ def getWeather(command, time):
         description = weather_description
 
         print(city_name)
-        currTime = getTimeGivenZone(zone_offset, time)
-        currHour = currTime[0]
+        if(zone_offset != ""):
+            currTime = getTimeGivenZone(zone_offset, time)
+            currHour = currTime[0]
+        else:
+            currHour = int(time.split()[3])
 
+        
         if(currHour>=6 and currHour<=10):
             timeOfDay = "morning"
         elif(currHour>=11 and currHour<=13):
@@ -156,8 +165,6 @@ def getWeather(command, time):
             humidity = "quite humid"
         else:
             humidity = "very humid"
-
-        print(city_name + "!!!!!!!")
         return "Considering its " + timeOfDay + " in " + city_name + " the current temperature is " + temperature + "Celsius. It is " + humidity + "outside with humidity levels at " + str(current_humidity) + " percent. I also notice the " + description 
 
     else:
