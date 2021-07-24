@@ -22,6 +22,7 @@ from dateAndTime.time import getTime,getTimezoneOffsetAndName,getTimeWithZoneInf
                                                                # So can say the time and timezones
 from weather.weather import getWeather                         # So can tell the weather
 from funFacts.facts import getFact                             # So can say fun facts
+from jokes.jokes import getJoke                                # So can say jokes
 from youtubeVideos.videos import clearRequest
 
 def take_command():
@@ -71,6 +72,9 @@ def run_bot():
         talk(toSay)
     elif(("fun" in command and "fact" in command) or ("something" in command and "interesting" in command)):
         toSay = getFact()
+    elif(("joke" in command) or ("something" in command and "funny" in command) or ("pun" in command)):
+        toSay = getJoke()
+        talk(toSay)
     elif("play" in command):
         toBeSearched = clearRequest(command)
         if(toBeSearched == ""):
