@@ -71,12 +71,13 @@ def getWeather(command, time, city):
 
 
 
-    command = command.split()
+    commandList = command.split()
     for i in range (len(cityList)):
-        if cityList[i] in command or cityList[i].lower() in command:
+        if cityList[i] in commandList or cityList[i].lower() in commandList:
             city_name = cityList[i]
             zone_name = timezoneNameList[i]
             zone_offset = timezoneGMTList[i][3:]
+
     
     if(city_name == ""):
         city_name = city
