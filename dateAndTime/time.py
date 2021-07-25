@@ -82,14 +82,20 @@ def getTimeWithZoneInfo(cityInfo,time):
                 minsOffset = int(GMTOffset[1])
             hour -= hourOffset
             mins -= minsOffset
-        print(hour)
-        print(hourOffset)
+
         # To avoid overflow
         if(mins >= 60):
             mins -= 60
             hour += 1
+        elif(mins < 0):
+            mins += 60
+            hour -= 1
+            if(hour < 0):
+                hour += 24
         if(hour >= 24):
             hour -= 24
+        elif(hour < 0):
+            hour += 24
         
 
         return cityName + " is in the " + zoneName + " timezone so the time there right now is " + str(hour) + "hours and " + str(mins) + "minutes."
