@@ -3549,7 +3549,6 @@ Kiten;Bulgaria;1115;Europe/Sofia
 Kavarna;Bulgaria;11205;Europe/Sofia
 Kaspichan;Bulgaria;3635;Europe/Sofia
 General Toshevo;Bulgaria;7758;Europe/Sofia
-Elena;Bulgaria;6042;Europe/Sofia
 Dimitrovgrad;Bulgaria;43288;Europe/Sofia
 Cherven Bryag;Bulgaria;13000;Europe/Sofia
 Borovo;Bulgaria;2467;Europe/Sofia

@@ -42,15 +42,18 @@ def take_command():
             # using google speech recognition
             spokenWords = recognizeSpeech.recognize_google(audio_text)
             print("Text: " + spokenWords) #add    , language = "bg-BG"   for bg
-        except:
-            print("Sorry, I did not get that - is your connection alright?")
+        except: pass          
     return spokenWords
 
 
 def run_bot():
-    command = take_command()
+    try:
+        command = take_command()
+    except:
+        talk("Sorry, I did not get that - is your connection alright?")
+        return 0
     toSay = "I'm so sorry! I couldn't understand you."
-
+    print(command)
     if("repeat" in command):
         repeat()
 
@@ -63,13 +66,13 @@ def run_bot():
         if(type(result) == type("String")):
             talk(result)
         elif(type(result) == type(['list'])):
-            talk("Sorry, are you asking about")
+            talk("Sorry, are you asking about the weather in ")
             for i in range(len(result)):
                 currCity = result[i][0]
                 currCountry = result[i][1]
                 talk(currCity + " in " + currCountry)
                 if(i != len(result) - 1):
-                    talk("or")
+                    talk("or in")
             command = take_command()
             toSay = findCorrectCityAndHour(command, result)
             talk(toSay)
@@ -79,13 +82,13 @@ def run_bot():
         if(type(result) == type("String")):
             talk(result)
         elif(type(result) == type(['list'])):
-            talk("Sorry, are you asking about")
+            talk("Sorry, are you asking about the time in ")
             for i in range(len(result)):
                 currCity = result[i][0]
                 currCountry = result[i][1]
                 talk(currCity + " in " + currCountry)
                 if(i != len(result) - 1):
-                    talk("or")
+                    talk("or in ")
             command = take_command()
             toSay = findCorrectCity(command, result)
             talk(toSay)
@@ -142,6 +145,3 @@ def playVideo(toBeSearched):
     search_results = re.findall(r'watch\?v=(\S{11})', html_content.read().decode())
     videoURL = "http://www.youtube.com/watch?v=" + search_results[0]
     webbrowser.open(videoURL, new=0, autoraise=True)
-
-
-run_bot()
