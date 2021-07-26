@@ -1,95 +1,90 @@
-import requests, json
+import requests
+import geocoder
+from datetime import datetime                                # So can tell the date/time
+import pytz
+from difflib import SequenceMatcher
 
-def getTimeGivenZone(GMTOffset, currTime):
-
-    hour = int(currTime.split()[3])
-    mins = int(currTime.split()[6])
-
-    hourOffset = 0
-    minsOffset = 0
-
-    if(GMTOffset[0] == "+"):  
-        if not (":" in GMTOffset):
-            hourOffset = int(GMTOffset[1:])
-        else:
-            GMTOffset = GMTOffset[1:].split(":")
-            hourOffset = int(GMTOffset[0])
-            minsOffset = int(GMTOffset[1])
-        hour += hourOffset
-        mins += minsOffset
-    elif(GMTOffset[0] == "-"):  
-        if not (":" in GMTOffset):
-            hourOffset = int(GMTOffset[1:])
-        else:
-            GMTOffset = GMTOffset[1:].split(":")
-            hourOffset = int(GMTOffset[0])
-            minsOffset = int(GMTOffset[1])
-        hour -= hourOffset
-        mins -= minsOffset
-
-    # To avoid overflow
-        if(mins >= 60):
-            mins -= 60
-            hour += 1
-        elif(mins < 0):
-            mins += 60
-            hour -= 1
-            if(hour < 0):
-                hour += 24
-        if(hour >= 24):
-            hour -= 24
-        elif(hour < 0):
-            hour += 24
-
-    updatedTime = []
-    updatedTime.append(hour)
-    updatedTime.append(mins)
-
-    return updatedTime
-
-def getWeather(command, time, city):
+def getWeather(command):
 
     cityList = []
-    timezoneNameList = []
-    timezoneGMTList = [] 
-
-    city_name = ""
-    zone_name = ""
-    zone_offset = ""    
+    countryList = []
+    timezoneList = []
 
     with open("../virtual-assistant/data/cities-and-full-timezones.txt") as file:
         for line in file:
             line = line[:-1].split(";")
             cityList.append(line[0])
-            timezoneNameList.append(line[1])
-            timezoneGMTList.append(line[2])
+            countryList.append(line[1])
+            timezoneList.append(line[3])
    
 
 
-#     for i in range(len(cityAndZoneList)):
-#         currCity = cityAndZoneList[i].split(";")[0]
-#         currZone = cityAndZoneList[i].split(";")[1]
-#         cityList.append(currCity)
-#         timezoneList.append(currZone)
+    possibleCities = []
+    for i in range (len(cityList)):
+        if cityList[i] in command or cityList[i].lower() in command:
+            possibleCities.append([cityList[i],countryList[i],timezoneList[i]])
+
+    if(len(possibleCities) == 0):
+        city = geocoder.ip('me').city
+        time = datetime.now()
+        time = time.strftime("%H:%M")
+        time = time.split(":")
 
 
+        hour = time[0]
+
+
+        hour = int(hour)
+        if(hour < 0):
+            hour += 24
+        
+        return getForecast([city," "], hour)
+            
+
+
+    elif(len(possibleCities) == 1):
+        hour = findHourGivenZone(possibleCities[0])
+        return getForecast(possibleCities[0], hour)
+
+    else:
+        return possibleCities
+
+def findCorrectCityAndHour(command, possibleCities):
+    maxRatio = 0
+    currCityInfo = []
+    print(possibleCities)
+
+    for i in range(len(possibleCities)):
+        currRatio = SequenceMatcher(None,command,possibleCities[i][0] + " " + possibleCities[i][1]).ratio()
+        if(currRatio > maxRatio):
+            maxRatio = currRatio
+            currCityInfo = possibleCities[i]
+    return getForecast(currCityInfo, findHourGivenZone(currCityInfo))
+
+def findHourGivenZone(cityInfo):
+    alternativeTime = pytz.timezone(cityInfo[2])
+    time = datetime.now(alternativeTime)
+    time = time.strftime("%H:%M")
+    time = time.split(":")
+
+    hour = time[0]
+
+    hour = int(hour) - 2
+    if(hour < 0):
+        hour += 24
+
+    return hour
+
+
+
+def getForecast(currCityInfo, currHour):
+    city_name = currCityInfo[0]
+    country_name = currCityInfo[1]
+
+    print("yea im here")
+    print(city_name)
     api_key = "64e227e42c69d247408b968ccff4bdc5"
     base_url = "http://api.openweathermap.org/data/2.5/weather?"  
-
-
-
-    commandList = command.split()
-    for i in range (len(cityList)):
-        if cityList[i] in commandList or cityList[i].lower() in commandList:
-            city_name = cityList[i]
-            zone_name = timezoneNameList[i]
-            zone_offset = timezoneGMTList[i][3:]
-
-    
-    if(city_name == ""):
-        city_name = city
-
-
     complete_url = base_url + "appid=" + api_key + "&q=" + city_name
     
     # get method of requests module
@@ -147,13 +142,6 @@ def getWeather(command, time, city):
         humidity = ""
         description = weather_description
 
-        print(city_name)
-        if(zone_offset != ""):
-            currTime = getTimeGivenZone(zone_offset, time)
-            currHour = currTime[0]
-        else:
-            currHour = int(time.split()[3])
-
         
         if(currHour>=6 and currHour<=10):
             timeOfDay = "morning"
@@ -173,7 +161,10 @@ def getWeather(command, time, city):
             humidity = "quite humid"
         else:
             humidity = "very humid"
-        return "Considering its " + timeOfDay + " in " + city_name + " the current temperature is " + temperature + "Celsius. It is " + humidity + "outside with humidity levels at " + str(current_humidity) + " percent. I also notice the " + description 
+        if(country_name != " "):
+            return "Considering its " + timeOfDay + " in " + city_name + " in " + country_name + " the current temperature is " + temperature + "Celsius. It is " + humidity + "outside with humidity levels at " + str(current_humidity) + " percent. I also notice the " + description 
+        else:
+            return "Considering its " + timeOfDay + " in " + city_name + " the current temperature is " + temperature + "Celsius. It is " + humidity + "outside with humidity levels at " + str(current_humidity) + " percent. I also notice the " + description 
 
     else:
-        print(" City Not Found ")
+        return "Sorry, this city is not in my database."

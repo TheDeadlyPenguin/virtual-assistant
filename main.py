@@ -18,9 +18,9 @@ import geocoder
 
 from capitals.capitals import getCapitalOrCountryName          # To find a capital/country given a capital/country
 from dateAndTime.date import getDate                           # So can say the date
-from dateAndTime.time import getTime,getTimezoneOffsetAndName,getTimeWithZoneInfo  
+from dateAndTime.time import getTime, findCorrectCity
                                                                # So can say the time and timezones
-from weather.weather import getWeather                         # So can tell the weather
+from weather.weather import getWeather, findCorrectCityAndHour                         # So can tell the weather
 from funFacts.facts import getFact                             # So can say fun facts
 from jokes.jokes import getJoke                                # So can say jokes
 from youtubeVideos.videos import clearRequest
@@ -53,28 +53,54 @@ def run_bot():
 
     if("repeat" in command):
         repeat()
+
     elif("capital" in command):
         toSay = getCapitalOrCountryName(command)
         talk(toSay)
+
     elif("weather" in command):
-        city = geocoder.ip('me').city
-        time = getTime()
-        toSay = getWeather(command,time,city)
-        talk(toSay)
+        result = getWeather(command)
+        if(type(result) == type("String")):
+            talk(result)
+        elif(type(result) == type(['list'])):
+            talk("Sorry, are you asking about")
+            for i in range(len(result)):
+                currCity = result[i][0]
+                currCountry = result[i][1]
+                talk(currCity + " in " + currCountry)
+                if(i != len(result) - 1):
+                    talk("or")
+            command = take_command()
+            toSay = findCorrectCityAndHour(command, result)
+            talk(toSay)
+
     elif("time" in command):
-        city = geocoder.ip('me').city
-        time = getTime()
-        cityInfo = getTimezoneOffsetAndName(command,city)
-        toSay = getTimeWithZoneInfo(cityInfo,time)
-        talk(toSay)
+        result = getTime(command)
+        if(type(result) == type("String")):
+            talk(result)
+        elif(type(result) == type(['list'])):
+            talk("Sorry, are you asking about")
+            for i in range(len(result)):
+                currCity = result[i][0]
+                currCountry = result[i][1]
+                talk(currCity + " in " + currCountry)
+                if(i != len(result) - 1):
+                    talk("or")
+            command = take_command()
+            toSay = findCorrectCity(command, result)
+            talk(toSay)
+
     elif("date" in command or ("what" in command and "today" in command)):
         toSay = getDate()
         talk(toSay)
+
     elif(("fun" in command and "fact" in command) or ("something" in command and "interesting" in command)):
         toSay = getFact()
+
     elif(("joke" in command) or ("something" in command and "funny" in command) or ("pun" in command)):
         toSay = getJoke()
         talk(toSay)
+
     elif("play" in command):
         toBeSearched = clearRequest(command)
         if(toBeSearched == ""):
@@ -82,6 +108,7 @@ def run_bot():
         else:
             talk("Certainly! Searching for " + toBeSearched + " on YouTube")
             playVideo(toBeSearched)
+
     else:
         talk(toSay)
 
@@ -117,4 +144,4 @@ def playVideo(toBeSearched):
     webbrowser.open(videoURL, new=0, autoraise=True)
 
 
-# run_bot()
+run_bot()
