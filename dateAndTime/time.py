@@ -29,12 +29,15 @@ def getTime(command):
 
         hour = time[0]
         mins = time[1]
-        print(hour)
+
+        if(hour[0] == '0'):
+            hour = hour[1]
+        if(mins[0] == '0'):
+            mins = mins[1]
         hour = int(hour)
         if(hour < 0):
             hour += 24
 
-        print(hour)
 
 
         return "The time is " + str(hour) + " o'clock and " + str(mins) + " minutes."
@@ -67,12 +70,15 @@ def findTimeGivenZone(cityInfo):
 
     hour = time[0]
     mins = time[1]
-    print(hour)
-    hour = int(hour) - 2
+
+    if(hour[0] == '0'):
+        hour = hour[1]
+    if(mins[0] == '0'):
+        mins = mins[1]
+    hour = int(hour)
     if(hour < 0):
         hour += 24
 
-    print(hour)
 
     
     return "The time in " + cityInfo[0] + " in " + cityInfo[1] + " is " + str(hour) + " o'clock and " + str(mins) + " minutes."

@@ -52,7 +52,7 @@ def getWeather(command):
 def findCorrectCityAndHour(command, possibleCities):
     maxRatio = 0
     currCityInfo = []
-    print(possibleCities)
+    # print(possibleCities)
 
     for i in range(len(possibleCities)):
         currRatio = SequenceMatcher(None,command,possibleCities[i][0] + " " + possibleCities[i][1]).ratio()
@@ -81,8 +81,6 @@ def getForecast(currCityInfo, currHour):
     city_name = currCityInfo[0]
     country_name = currCityInfo[1]
 
-    print("yea im here")
-    print(city_name)
     api_key = "64e227e42c69d247408b968ccff4bdc5"
     base_url = "http://api.openweathermap.org/data/2.5/weather?"  
     complete_url = base_url + "appid=" + api_key + "&q=" + city_name
@@ -129,14 +127,14 @@ def getForecast(currCityInfo, currHour):
         weather_description = z[0]["description"]
     
         # print following values
-        print(" Temperature (in kelvin unit) = " +
-                        str(current_temperature) +
-            "\n atmospheric pressure (in hPa unit) = " +
-                        str(current_pressure) +
-            "\n humidity (in percentage) = " +
-                        str(current_humidity) +
-            "\n description = " +
-                        str(weather_description))
+        # print(" Temperature (in kelvin unit) = " +
+        #                 str(current_temperature) +
+        #     "\n atmospheric pressure (in hPa unit) = " +
+        #                 str(current_pressure) +
+        #     "\n humidity (in percentage) = " +
+        #                 str(current_humidity) +
+        #     "\n description = " +
+        #                 str(weather_description))
         timeOfDay = ""
         temperature = str(round(current_temperature-273.15,0))
         humidity = ""

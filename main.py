@@ -25,6 +25,7 @@ from funFacts.facts import getFact                             # So can say fun 
 from jokes.jokes import getJoke                                # So can say jokes
 from youtubeVideos.videos import clearRequest
 
+
 def take_command():
     recognizeSpeech = sr.Recognizer()
 
@@ -33,15 +34,14 @@ def take_command():
 
     with sr.Microphone() as source:
         spokenWords = ""
-        print("Talk")
-        audio_text = recognizeSpeech.listen(source, timeout = 5.0)
-        print("Time over, thanks")
+        # print("Talk")
+        audio_text = recognizeSpeech.listen(source)
+        # print("Time over, thanks")
     # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling
-        
         try:
             # using google speech recognition
             spokenWords = recognizeSpeech.recognize_google(audio_text)
-            print("Text: " + spokenWords) #add    , language = "bg-BG"   for bg
+            # print("Text: " + spokenWords) #add    , language = "bg-BG"   for bg
         except: pass          
     return spokenWords
 
@@ -53,7 +53,7 @@ def run_bot():
         talk("Sorry, I did not get that - is your connection alright?")
         return 0
     toSay = "I'm so sorry! I couldn't understand you."
-    print(command)
+    # print(command)
     if("repeat" in command):
         repeat()
 
@@ -99,6 +99,7 @@ def run_bot():
 
     elif(("fun" in command and "fact" in command) or ("something" in command and "interesting" in command)):
         toSay = getFact()
+        talk(toSay)
 
     elif(("joke" in command) or ("something" in command and "funny" in command) or ("pun" in command)):
         toSay = getJoke()
@@ -109,7 +110,7 @@ def run_bot():
         if(toBeSearched == ""):
             talk("Sorry, I didn't get what you want me to play.")
         else:
-            talk("Certainly! Searching for " + toBeSearched + " on YouTube")
+            talk("Certainly! Let me find it in YouTube")
             playVideo(toBeSearched)
 
     else:
@@ -132,16 +133,20 @@ def talk(toSay):
 
 def repeat():
     repeatIntro = "The last thing I said was"
-
+    try:
+        os.remove("repeat.mp3")
+    except:
+        pass
     toSpeak = gTTS(text=repeatIntro, lang="en", slow=False)
     toSpeak.save("repeat.mp3")
     playsound('repeat.mp3')
     playsound('reply.mp3')
 
 def playVideo(toBeSearched):
-    print(toBeSearched)
+    # print(toBeSearched)
     query_string = urllib.parse.urlencode({"search_query" : toBeSearched})
     html_content = urllib.request.urlopen("http://www.youtube.com/results?" + query_string)
     search_results = re.findall(r'watch\?v=(\S{11})', html_content.read().decode())
     videoURL = "http://www.youtube.com/watch?v=" + search_results[0]
     webbrowser.open(videoURL, new=0, autoraise=True)
+
